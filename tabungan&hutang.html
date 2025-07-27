@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catatan Tabungan & Hutang Warung</title>
+  <style>
+  /* RESET DASAR */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  padding: 20px;
+  font-size: 18px; /* Ukuran font dasar diperbesar */
+}
+
+/* CONTAINER UTAMA */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* HEADING */
+h1, h3 {
+  margin-bottom: 16px;
+  color: #2c3e50;
+}
+
+/* FORM GROUP */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+input, select, button {
+  font-size: 16px !important; 
+}
+input[type="text"],
+input[type="date"],
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* BUTTONS */
+button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+/* Tombol berdasarkan fungsi */
+button[type="submit"] {
+  background-color: #007bff;
+}
+#formBayar button[type="submit"] {
+  background-color: #17a2b8;
+}
+/* Tambahkan ini di bagian CSS */
+#keterangan {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+#keterangan:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+}
+#keteranganBayar {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s;
+  margin-bottom: 12px;
+}
+
+#keteranganBayar:focus {
+  border-color: #17a2b8;
+  outline: none;
+}
+
+#keteranganBayarCustom {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  transition: all 0.3s;
+}
+#toggleTabel {
+  background-color: #6c757d;
+}
+/* Perbesar elemen saat dihover */
+button, input, select {
+  transition: transform 0.2s;
+}
+
+button:hover, input:hover, select:hover {
+  transform: scale(1.02);
+}
+/* Tombol aksi di tabel */
+button.lunasi-btn {
+  background-color: #28a745;
+}
+
+button.batal-btn {
+  background-color: #fd7e14;
+}
+
+button.edit-btn {
+  background-color: #ffc107;
+  color: black;
+}
+
+button.hapus-btn {
+  background-color: #e3342f;
+}
+
+button.riwayat-btn {
+  background-color: #6f42c1;
+}
+#batalEdit {
+  background-color: #dc3545;
+}
+
+#batalEdit:hover {
+  background-color: #a71d2a;
+}
+/* Pastikan lebar kolom aksi tetap konsisten */
+#tabelHutang td:nth-child(6) {
+  min-width: 250px;
+}
+/* TABLE STYLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 16px !important;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f1f1f1;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* STATUS CLASS */
+tr.lunas {
+  background-color: #e6ffed;
+}
+
+tr.belum-lunas {
+  background-color: #fff3cd;
+}
+.form-group label {
+  font-size: 18px !important;
+}
+/* RINGKASAN */
+.summary {
+  margin-top: 32px;
+  background: #f7f9fb;
+  padding: 16px;
+  border-radius: 10px;
+  font-size: 25px;
+}
+
+.summary p {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* STORAGE */
+.storage-info {
+  margin-top: 16px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 14px;
+  background-color: #e0e0e0;
+  border-radius: 7px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #28a745;
+  width: 0%;
+  transition: width 0.5s ease-in-out;
+}
+
+/* NOTIFIKASI */
+.notification {
+  position: fixed;
+  top: 10px;
+  left: 80%;
+  transform: translateX(-50%);
+  padding: 14px 24px;
+  border-radius: 8px;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 999;
+}
+
+.notification.success {
+  background-color: #28a745;
+}
+
+.notification.error {
+  background-color: #dc3545;
+}
+
+/* TOGGLE TABEL */
+.hidden {
+  display: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    padding: 12px;
+  }
+
+  td {
+    padding: 8px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    border: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  td:last-child {
+    border-bottom: none;
+  }
+  td:nth-child(4)::before {
+    content: "Keterangan: ";
+    font-weight: bold;
+  }
+  button {
+    margin-top: 8px;
+    width: 100%;
+  }
+  /* Ukuran font lebih besar di mobile */
+  table, table td {
+    font-size: 20px !important;
+  }
+  
+  table th {
+    font-size: 18px !important;
+  }
+}
+input[type="text"],
+input[type="date"],
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+input:focus,
+select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.4); /* glow tipis pas fokus */
+}
+/* FORM & BAGIAN-BAGIAN YANG DIPISAH DENGAN BINGKAI */
+#formHutang,
+.form-pembayaran,
+.summary,
+.storage-info,
+#cari,
+#toggleTabel {
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* KHUSUS UNTUK BAGIAN PENCARIAN & TOGGLE BUTTON */
+#cari {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+/* UNTUK GROUP TOGGLE BUTTON */
+#toggleTabel {
+  margin-top: 12px;
+  width: 100%;
+}
+  /* ... CSS yang sudah ada ... */
+
+  /* Gaya untuk riwayat pembayaran */
+  .riwayat-container {
+    display: none;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 100% !important;
+    max-width: 800px !important;
+    font-size: 18px !important;
+    padding: 25px !important;
+  }
+
+  .riwayat-container h4 {
+    margin-bottom: 12px;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    font-size: 25px !important;
+  }
+
+  .riwayat-list {
+    list-style-type: none;
+    font-size: 25px !important;
+  }
+
+  .riwayat-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .riwayat-list li:last-child {
+    border-bottom: none;
+  }
+
+  .riwayat-total {
+    font-weight: bold;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 2px solid #ddd;
+    font-size: 25px;
+  }
+
+  .close-riwayat {
+    float: right;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 5px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    font-size: 15px;
+  }
+    /* CSS akan ditambahkan nanti */
+    .hidden { display: none; }
+    .tab-container { margin-bottom: 20px; }
+    .tab-button {
+      padding: 10px 20px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+    }
+    .tab-button.active {
+      background: #007bff;
+      color: white;
+    }
+    /* === GAYA KHUSUS TABUNGAN === */
+#tabungan-content {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+#formTabungan .form-group {
+  margin-bottom: 15px;
+}
+
+#formTabungan label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+#formTabungan input, 
+#formTabungan select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+#formTabungan input:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+#jumlahTabungan {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+}
+
+#formTabungan button[type="submit"] {
+  background: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#formTabungan button[type="submit"]:hover {
+  background: #218838;
+}
+#formBon {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+#formBon h3 {
+  color: #dc3545;
+  margin-bottom: 12px;
+}
+
+#formBon button[type="submit"] {
+  background-color: #dc3545;
+}
+
+#formBon button[type="submit"]:hover {
+  background-color: #a71d2a;
+}
+/* Tabel Tabungan */
+#tabelTabungan {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+#tabelTabungan th {
+  background: #28a745;
+  color: white;
+  padding: 12px;
+  text-align: left;
+}
+
+#tabelTabungan td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#tabelTabungan tr:hover {
+  background: #f1f8e9;
+}
+
+/* Tombol Aksi */
+.riwayat-btn { background: #17a2b8; color: white; }
+.export-btn { background: #6f42c1; color: white; }
+.hapus-btn { background: #dc3545; color: white; }
+
+/* Riwayat Popup */
+[style*="position: fixed"] {
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}
+/* Gaya popup riwayat tabungan */
+[style*="position: fixed"] {
+  width: 90% !important; /* Lebar 90% layar */
+  max-width: 800px !important; /* Maksimal 800px */
+  max-height: 85vh !important; /* Tinggi 85% viewport */
+  font-size: 25px !important; /* Ukuran font lebih besar */
+  padding: 25px !important;
+  border: 3px solid #28a745 !important; /* Garis tebal */
+}
+
+/* Judul popup */
+[style*="position: fixed"] h3 {
+  font-size: 25px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Tabel dalam popup */
+[style*="position: fixed"] table {
+  font-size: 30px !important;
+}
+
+/* Tombol tutup */
+[style*="position: fixed"] button {
+  font-size: 20px !important;
+  padding: 5px 5px !important;
+}
+/* Progress Bar Gabungan */
+.storage-info {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+  background: white;
+}
+
+.progress-bar {
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+#totalProgressFill {
+  height: 100%;
+  background: #6c757d;
+  transition: width 0.5s;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Catatan Tabungan & Hutang Warung</h1>
+    
+    <div class="tab-container">
+      <button class="tab-button active" data-tab="tabungan">Tabungan</button>
+      <button class="tab-button" data-tab="hutang">Hutang</button>
+    </div>
+
+    <!-- TAB TABUNGAN -->
+    <div id="tabungan-content">
+      <!-- Form Input Tabungan -->
+      <form id="formTabungan">
+        <div class="form-group">
+          <label for="namaTabungan">🪪 Nama Penabung:</label>
+          <input type="text" id="namaTabungan" list="daftarPenabung" required>
+          <datalist id="daftarPenabung"></datalist>
+        </div>
+        
+        <div class="form-group">
+          <label for="tanggalTabungan">🗓️ Tanggal:</label>
+          <input type="date" id="tanggalTabungan" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="jumlahTabungan">Jumlah Tabungan (Rp):</label>
+          <input type="text" id="jumlahTabungan" placeholder="Contoh: 50.000" required>
+        </div>
+        
+        <button type="submit">💾 Simpan Tabungan</button>
+      </form>
+        <!-- Taruh di bawah form tabungan -->
+        <form id="formBon" style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 20px;">
+          <h3>📤 Pengambilan Uang (Bon)</h3>
+          <div class="form-group">
+            <label for="namaBon">🪪 Nama Penabung:</label>
+            <select id="namaBon" required>
+              <option value="">Pilih penabung</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="tanggalBon">🗓️ Tanggal Ambil:</label>
+            <input type="date" id="tanggalBon" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="jumlahBon">Jumlah Ambil (Rp):</label>
+            <input type="text" id="jumlahBon" placeholder="Contoh: 50.000" required>
+          </div>
+          
+          <button type="submit">💸 Proses Pengambilan</button>
+        </form>
+      <!-- Pencarian -->
+      <div style="margin: 20px 0;">
+        <label for="cariTabungan">🔍 Cari Penabung:</label>
+        <input type="text" id="cariTabungan" placeholder="Ketik nama atau tanggal...">
+      </div>
+
+      <button id="toggleTabelTabungan" style="padding: 8px 16px; margin-bottom: 10px;">
+        👁️ Sembunyikan Tabel
+      </button>
+
+      <!-- Daftar Tabungan -->
+      <table id="tabelTabungan">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Tanggal</th>
+            <th>Jumlah Tabungan</th>
+            <th>Total Tabungan</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <!-- Form Backup -->
+      <div style="margin-top: 20px;">
+        <button id="backupAllTabungan">📂 Backup Semua Data Tabungan</button>
+      </div>
+    </div>
+    <!-- TAB HUTANG (dari kode sebelumnya) -->
+    <div id="hutang-content" class="hidden">
+      <form id="formHutang">
+      <div class="form-group">
+        <label for="nama">🪪 Nama:</label>
+        <input type="text" id="nama" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="tanggal">🗓️ Tanggal:</label>
+        <input type="date" id="tanggal" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="jumlah">Jumlah Hutang (Rp):</label>
+        <input type="text" id="jumlah" placeholder="Contoh: 50.000" required>
+      </div>
+      <div class="form-group">
+      <label for="keterangan">📝 Keterangan Hutang:</label>
+      <input type="text" id="keterangan" placeholder="Contoh: Rokok,Roti,dll">
+      </div>
+      <button type="submit">💾 Simpan Hutang</button>
+      <button type="button" id="batalEdit" style="background: #dc3545;">❌ Batal</button>
+    </form>
+
+    <!-- Pencarian -->
+    <div style="margin: 20px 0;">
+      <label for="cari">🔍 Cari nama orang hutang:</label>
+      <input type="text" id="cari" placeholder="Ketik nama orang hutang...">
+    </div>
+    <!-- Taruh di bawah form pencarian -->
+      <div style="margin: 10px 0;">
+        <button id="toggleTabel" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 6px;">
+          👁️ Sembunyikan Tabel
+        </button>
+      </div>
+
+    <!-- Daftar Hutang -->
+    <table id="tabelHutang">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Tanggal</th>
+          <th>Jumlah Hutang</th>
+          <th>Keterangan</th>
+          <th>Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+<!-- Taruh di bawah form hutang -->
+      <div class="form-pembayaran" style="margin-top: 20px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+        <h3>💵 Pembayaran Hutang</h3>
+        <form id="formBayar">
+          <div class="form-group">
+            <label for="namaBayar">Nama :</label>
+            <select id="namaBayar" required>
+              <option value="">Pilih nama</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="jumlahBayar">Jumlah Bayar (Rp):</label>
+            <input type="text" id="jumlahBayar" placeholder="Contoh: 50.000" required>
+          </div>
+          <div class="form-group">
+            <label for="tanggalBayar">Tanggal Bayar:</label>
+            <input type="date" id="tanggalBayar" required>
+          </div>
+          <div class="form-group">
+          <label for="keteranganBayar">📝 Keterangan Pembayaran:</label>
+          <select id="keteranganBayar" required>
+            <option value="">Pilih keterangan terkait</option>
+            <!-- Option akan diisi oleh JavaScript -->
+          </select>
+          <input type="text" id="keteranganBayarCustom" placeholder="Atau ketik keterangan custom" style="margin-top: 8px; display: none;">
+          </div>
+          <button type="submit">💳 Simpan Pembayaran</button>
+        </form>
+      </div>
+    <!-- Ringkasan -->
+    <div class="summary">
+      <h3>Ringkasan</h3>
+      <p id="totalOrang">Total Orang yang hutang: 0</p>
+      <p id="totalHutang">Total Hutang: Rp0</p>
+      <p id="totalLunas">Hutang Lunas: Rp0</p>
+      <p id="totalBelumLunas">Hutang Belum Lunas: Rp0</p>
+      </div>
+          <div class="storage-info">
+        <p>💾 Kapasitas LocalStorage: <span id="storageUsed">0 KB</span> / 5 MB</p>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- PROGRESS BAR GABUNGAN (TARUH DI SINI) -->
+  <div class="storage-info" style="margin-top: 30px; background: #f8f9fa; padding: 15px; border-radius: 10px;">
+    <h3>📊 Kapasitas Penyimpanan</h3>
+    <p>Total Terpakai: <span id="totalStorageUsed">0 KB</span> / 5 MB</p>
+    <div class="progress-bar" style="height: 10px; background: #e0e0e0; border-radius: 5px; margin: 10px 0;">
+      <div id="totalProgressFill" style="height: 100%; width: 0%; background: #6c757d; border-radius: 5px;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+      <span>Tabungan: <span id="storageTabungan">0 KB</span></span>
+      <span>Hutang: <span id="storageHutang">0 KB</span></span>
+    </div>
+  </div>
+
+  <script>
+    // Data Tabungan
+    const TABUNGAN_KEY = 'dataTabunganWarung';
+    
+// Tambahkan ini di awal script utama
+    function getDataTabungan() {
+      const data = localStorage.getItem(TABUNGAN_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function simpanDataTabungan(data) {
+      localStorage.setItem(TABUNGAN_KEY, JSON.stringify(data));
+        updateStorageInfo();
+    }
+
+    // Format Rupiah
+    function formatRupiah(angka) {
+      return parseInt(angka).toLocaleString('id-ID');
+    }
+
+    // Format Tanggal
+    function formatTanggal(tanggal) {
+      const date = new Date(tanggal);
+      return date.toLocaleDateString('id-ID');
+    }
+
+    // Auto-format input tabungan
+    document.getElementById('jumlahTabungan').addEventListener('input', function(e) {
+      let value = this.value.replace(/[^0-9]/g, '');
+      this.value = value ? formatRupiah(value) : '';
+    });
+
+    // Submit form tabungan
+    document.getElementById('formTabungan').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const nama = document.getElementById('namaTabungan').value.trim();
+      const tanggal = document.getElementById('tanggalTabungan').value;
+      const jumlah = document.getElementById('jumlahTabungan').value.replace(/\./g, '');
+      
+      if (!nama || !tanggal || !jumlah) {
+        alert('Semua kolom harus diisi!');
+        return;
+      }
+      
+      const data = getDataTabungan();
+      const index = data.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
+      
+      const newEntry = {
+        tanggal,
+        jumlah: parseInt(jumlah),
+        nama
+      };
+      
+      if (index === -1) {
+        // Penabung baru
+        data.push({
+          nama,
+          riwayat: [newEntry],
+          total: parseInt(jumlah)
+        });
+      } else {
+        // Penabung sudah ada
+        data[index].riwayat.push(newEntry);
+        data[index].total += parseInt(jumlah);
+      }
+      
+      simpanDataTabungan(data);
+      tampilkanDataTabungan();
+      updateDaftarPenabung();
+      this.reset();
+    });
+    document.getElementById('jumlahBon').addEventListener('input', function(e) {
+        let value = this.value.replace(/[^0-9]/g, '');
+        this.value = value ? formatRupiah(value) : '';
+      });
+      
+      // Submit form bon
+      document.getElementById('formBon').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nama = document.getElementById('namaBon').value;
+        const tanggal = document.getElementById('tanggalBon').value;
+        const jumlahAmbil = parseInt(document.getElementById('jumlahBon').value.replace(/\./g, ''));
+        
+        if (!nama || !tanggal || !jumlahAmbil) {
+          alert('Semua kolom harus diisi!');
+          return;
+        }
+        
+        const data = getDataTabungan();
+        const index = data.findIndex(item => item.nama === nama);
+        
+        if (index === -1) {
+          alert('Nama penabung tidak ditemukan!');
+          return;
+        }
+        
+        // Hitung biaya admin (5rb per 100rb dari jumlah yang diambil)
+        const kelipatan = Math.floor(jumlahAmbil / 100000);
+        const biayaAdmin = kelipatan * 5000;
+        const totalPotongan = jumlahAmbil + biayaAdmin;
+        
+        // Validasi saldo cukup (jumlah ambil + biaya admin)
+        if (data[index].total < totalPotongan) {
+          alert(`Saldo tidak mencukupi!\nButuh: Rp${formatRupiah(totalPotongan)}\nSaldo: Rp${formatRupiah(data[index].total)}`);
+          return;
+        }
+        
+        // Kurangi tabungan (jumlah ambil + biaya admin)
+        data[index].total -= totalPotongan;
+        
+        // Tambahkan riwayat pengambilan
+        data[index].riwayat.push({
+          tanggal,
+          jumlah: -jumlahAmbil,
+          jenis: 'pengambilan',
+          biayaAdmin,
+          keterangan: `Pengambilan tunai + Biaya admin Rp${formatRupiah(biayaAdmin)}`
+        });
+        
+        simpanDataTabungan(data);
+        
+        // Notifikasi sukses
+        showNotification(
+          `✅ Pengambilan berhasil!\n\n` +
+          `Jumlah Diambil: Rp${formatRupiah(jumlahAmbil)}\n` +
+          `Biaya Admin: Rp${formatRupiah(biayaAdmin)}\n` +
+          `Total Dipotong: Rp${formatRupiah(totalPotongan)}\n` +
+          `Sisa Saldo: Rp${formatRupiah(data[index].total)}`,
+          'success'
+        );
+        
+        this.reset();
+        tampilkanDataTabungan();
+        updateDaftarPenabung();
+      });
+
+    // Tampilkan data tabungan
+    function tampilkanDataTabungan(filter = '') {
+      const data = getDataTabungan();
+      const tbody = document.querySelector('#tabelTabungan tbody');
+      tbody.innerHTML = '';
+
+      const filteredData = filter 
+        ? data.filter(item => 
+            item.nama.toLowerCase().includes(filter.toLowerCase()) ||
+            item.riwayat.some(t => t.tanggal.includes(filter)))
+        : data;
+
+      filteredData.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        const lastEntry = item.riwayat[item.riwayat.length - 1];
+        
+        tr.innerHTML = `
+          <td>${item.nama}</td>
+          <td>${formatTanggal(lastEntry.tanggal)}</td>
+          <td>Rp${formatRupiah(lastEntry.jumlah)}</td>
+          <td>Rp${formatRupiah(item.total)}</td>
+          <td>
+            <button class="riwayat-btn" onclick="showRiwayatTabungan('${item.nama}')">📜 Riwayat</button>
+            <button class="export-btn" onclick="exportTabungan('${item.nama}')">📤 Export</button>
+            <button class="hapus-btn" onclick="hapusTabungan(${index})">🗑 Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Riwayat Tabungan
+    function showRiwayatTabungan(nama) {
+        const data = getDataTabungan().find(item => item.nama === nama);
+        if (!data) return;
+        
+        let riwayatHTML = `
+          <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+          background: white; padding: 20px; border: 3px solid #ddd; z-index: 1000; max-width: 90%; max-height: 70vh; overflow: auto;">
+            <h3>Riwayat Tabungan ${nama}</h3>
+            <p><em><strong>Biaya Admin:</strong> 5rb per 100rb pengambilan</em></p>
+            <button onclick="this.parentElement.remove()" style="float: right; width: 50%; margin-top: 15px;">✕ Tutup</button>
+            <table border="1" style="width: 100%; margin-top: 10px;">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Jenis</th>
+                  <th>Jumlah</th>
+                  <th>Biaya Admin</th>
+                  <th>Total</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+        
+        data.riwayat.forEach((entry, idx) => {
+          const jenis = entry.jenis === 'pengambilan' ? 'Pengambilan' : 'Setoran';
+          const jumlahClass = entry.jumlah < 0 ? 'style="color: red;"' : '';
+          const biayaAdmin = entry.biayaAdmin ? `Rp${formatRupiah(entry.biayaAdmin)}` : '-';
+          const total = entry.jenis === 'pengambilan' 
+            ? `-Rp${formatRupiah(Math.abs(entry.jumlah) + (entry.biayaAdmin || 0))}`
+            : `+Rp${formatRupiah(entry.jumlah)}`;
+          
+          riwayatHTML += `
+            <tr>
+              <td>${formatTanggal(entry.tanggal)}</td>
+              <td>${jenis}</td>
+              <td ${jumlahClass}>${entry.jumlah < 0 ? '-' : ''}Rp${formatRupiah(Math.abs(entry.jumlah))}</td>
+              <td>${biayaAdmin}</td>
+              <td ${entry.jenis === 'pengambilan' ? 'style="color: red;"' : ''}>${total}</td>
+              <td>${entry.keterangan || '-'}</td>
+            </tr>
+          `;
+        });
+        
+        riwayatHTML += `
+              </tbody>
+            </table>
+            <p style="margin-top: 10px; font-weight: bold;">
+              Saldo Saat Ini: Rp${formatRupiah(data.total)}
+            </p>
+          </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', riwayatHTML);
+      }
+
+    // Hapus riwayat tabungan
+    function hapusRiwayatTabungan(nama, index) {
+      if (!confirm('Yakin hapus riwayat ini?')) return;
+      
+      const data = getDataTabungan();
+      const tabungan = data.find(item => item.nama === nama);
+      if (!tabungan || !tabungan.riwayat[index]) return;
+      
+      // Kurangi dari total
+      tabungan.total -= tabungan.riwayat[index].jumlah;
+      
+      // Hapus riwayat
+      tabungan.riwayat.splice(index, 1);
+      
+      // Jika tidak ada riwayat lagi, hapus penabung
+      if (tabungan.riwayat.length === 0) {
+        data.splice(data.indexOf(tabungan), 1);
+      }
+      
+      simpanDataTabungan(data);
+      document.querySelector('[style*="position: fixed"]').remove();
+      tampilkanDataTabungan();
+    }
+
+    // Export tabungan per orang
+    function exportTabungan(nama) {
+        const data = getDataTabungan().find(item => item.nama === nama);
+        if (!data) return;
+      
+        // Format untuk file text
+        let fileText = `================================\n`;
+        fileText += `       TABUNGAN\n`;
+        fileText += `================================\n`;
+        fileText += `Nama       : ${data.nama}\n`;
+        fileText += `Saldo      : Rp${formatRupiah(data.total)}\n`;
+        fileText += `Biaya Admin: 5rb per 100rb pengambilan\n`;
+        fileText += `================================\n\n`;
+        fileText += `RIWAYAT TRANSAKSI:\n`;
+        fileText += `================================\n`;
+        
+        data.riwayat.forEach(entry => {
+          const jenis = entry.jenis === 'pengambilan' ? 'PENGAMBILAN' : 'SETORAN';
+          const jumlah = entry.jumlah < 0 ? `-Rp${formatRupiah(Math.abs(entry.jumlah))}` : `+Rp${formatRupiah(entry.jumlah)}`;
+          
+          fileText += `${formatTanggal(entry.tanggal)} - ${jenis}\n`;
+          fileText += `Jumlah    : ${jumlah}\n`;
+          if (entry.biayaAdmin) {
+            fileText += `Biaya Admin: Rp${formatRupiah(entry.biayaAdmin)}\n`;
+            fileText += `Total Potong: Rp${formatRupiah(Math.abs(entry.jumlah) + entry.biayaAdmin)}\n`;
+          }
+          if (entry.keterangan) fileText += `Keterangan: ${entry.keterangan}\n`;
+          fileText += `--------------------------------\n`;
+        });
+        
+        fileText += `================================\n`;
+        fileText += `Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}\n`;
+      
+        // Format khusus untuk WhatsApp (tanpa karakter aneh)
+        let whatsappText = `*TABUNGAN*\n\n`;
+        whatsappText += `Nama: ${data.nama}\n`;
+        whatsappText += `Saldo: Rp${formatRupiah(data.total)}\n\n`;
+        whatsappText += `*RIWAYAT TRANSAKSI:*\n`;
+        
+        data.riwayat.forEach(entry => {
+          const jenis = entry.jenis === 'pengambilan' ? 'PENGAMBILAN' : 'SETORAN';
+          const jumlah = entry.jumlah < 0 ? `-Rp${formatRupiah(Math.abs(entry.jumlah))}` : `+Rp${formatRupiah(entry.jumlah)}`;
+          
+          whatsappText += `\n${formatTanggal(entry.tanggal)} - ${jenis}\n`;
+          whatsappText += `Jumlah: ${jumlah}\n`;
+          if (entry.biayaAdmin) {
+            whatsappText += `Biaya Admin: Rp${formatRupiah(entry.biayaAdmin)}\n`;
+            whatsappText += `Total: Rp${formatRupiah(Math.abs(entry.jumlah) + entry.biayaAdmin)}\n`;
+          }
+          if (entry.keterangan) whatsappText += `(${entry.keterangan})\n`;
+        });
+        
+        whatsappText += `\n_Tanggal Cetak: ${new Date().toLocaleDateString('id-ID')}_`;
+      
+        // Download file text
+        const blob = new Blob([fileText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Tabungan-${data.nama}-${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+      
+        // Buka WhatsApp dengan format yang lebih clean
+        window.open(`https://wa.me/?text=${encodeURIComponent(whatsappText)}`, '_blank');
+      }
+
+    // Backup semua data tabungan
+    document.getElementById('backupAllTabungan').addEventListener('click', function() {
+      const data = getDataTabungan();
+      let text = '=== BACKUP DATA TABUNGAN ===\n\n';
+      
+      data.forEach(item => {
+        text += `Nama: ${item.nama}\n`;
+        text += `Saldo Akhir: Rp${formatRupiah(item.total)}\n`;
+        text += `Riwayat Transaksi:\n`;
+        
+        item.riwayat.forEach(entry => {
+          const jenis = entry.jenis === 'pengambilan' ? 'PENGAMBILAN' : 'SETORAN';
+          const jumlah = entry.jumlah < 0 ? `-Rp${formatRupiah(Math.abs(entry.jumlah))}` : `+Rp${formatRupiah(entry.jumlah)}`;
+          
+          text += `\n- Tanggal: ${formatTanggal(entry.tanggal)}\n`;
+          text += `  Jenis: ${jenis}\n`;
+          text += `  Jumlah: ${jumlah}\n`;
+          
+          if (entry.biayaAdmin) {
+            text += `  Biaya Admin: Rp${formatRupiah(entry.biayaAdmin)}\n`;
+            text += `  Total Potong: Rp${formatRupiah(Math.abs(entry.jumlah) + entry.biayaAdmin)}\n`;
+          }
+          
+          if (entry.keterangan) {
+            text += `  Keterangan: ${entry.keterangan}\n`;
+          }
+        });
+        
+        text += '\n================================\n\n';
+      });
+      // Di akhir fungsi backupAllTabungan
+    showNotification(
+      `Backup data tabungan berhasil! Total ${data.length} nasabah.`,
+      'success'
+    );
+      // Download file
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Backup-Tabungan-${new Date().toISOString().split('T')[0]}.txt`;
+      a.click();
+    });
+
+    // Hapus data tabungan
+    function hapusTabungan(index) {
+      if (!confirm('Yakin hapus semua data tabungan ini?')) return;
+      
+      const data = getDataTabungan();
+      data.splice(index, 1);
+      simpanDataTabungan(data);
+      tampilkanDataTabungan();
+    }
+
+    // Update daftar penabung untuk autocomplete
+    // Update daftar penabung untuk dropdown bon
+      function updateDaftarPenabung() {
+        const datalist = document.getElementById('daftarPenabung');
+        const select = document.getElementById('namaBon');
+        
+        datalist.innerHTML = '';
+        select.innerHTML = '<option value="">Pilih penabung</option>';
+        
+        const data = getDataTabungan();
+        data.forEach(item => {
+          // Untuk datalist (autocomplete)
+          const option = document.createElement('option');
+          option.value = item.nama;
+          datalist.appendChild(option);
+          
+          // Untuk select (dropdown bon)
+          const optionSelect = document.createElement('option');
+          optionSelect.value = item.nama;
+          optionSelect.textContent = `${item.nama} (Tabungan: Rp${formatRupiah(item.total)})`;
+          select.appendChild(optionSelect);
+        });
+      }
+
+    // Pencarian tabungan
+    document.getElementById('cariTabungan').addEventListener('input', function() {
+      tampilkanDataTabungan(this.value);
+    });
+
+    // Toggle tabel tabungan
+    document.getElementById('toggleTabelTabungan').addEventListener('click', function() {
+      const tabel = document.getElementById('tabelTabungan');
+      tabel.classList.toggle('hidden');
+      this.textContent = tabel.classList.contains('hidden') 
+        ? '👁️ Tampilkan Tabel' 
+        : '👁️ Sembunyikan Tabel';
+    });
+
+    // Simpan tab aktif ke localStorage
+      function setActiveTab(tabName) {
+        localStorage.setItem('activeTab', tabName);
+      }
+      
+      // Ambil tab aktif dari localStorage
+      function getActiveTab() {
+        return localStorage.getItem('activeTab') || 'tabungan';
+      }
+      
+      // Modifikasi event listener tab navigation
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+          document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          const tabName = this.dataset.tab;
+          setActiveTab(tabName);
+          
+          document.getElementById('hutang-content').classList.toggle('hidden', tabName !== 'hutang');
+          document.getElementById('tabungan-content').classList.toggle('hidden', tabName !== 'tabungan');
+        });
+      });
+      // Saat halaman dimuat, set tab sesuai localStorage
+      document.addEventListener('DOMContentLoaded', function() {
+        const activeTab = getActiveTab();
+        const tabButton = document.querySelector(`.tab-button[data-tab="${activeTab}"]`);
+        if (tabButton) {
+          tabButton.click();
+        }
+      });
+    // Inisialisasi
+    updateDaftarPenabung();
+    tampilkanDataTabungan();
+  </script>
+
+  <!-- Script untuk bagian hutang (dari kode sebelumnya) -->
+  <script>
+    // ... Kode hutang yang sudah ada ...
+    let currentEditIndex = null; // Taruh di bagian atas script (global variable)
+    // Fungsi utama
+    function parseNominal(input) {
+  return parseInt(input.replace(/[^0-9]/g, '')) || 0; // Handle angka dengan titik/koma
+}
+    function simpanDataKeLocalStorage(data) {
+      try {
+    // Pastikan semua field ada
+        const dataFix = data.map(item => ({
+          nama: item.nama,
+          tanggal: item.tanggal,
+          jumlah: item.jumlah,
+          keterangan: item.keterangan || '-',
+          lunas: item.lunas || false, // Pastikan status lunas ada
+          riwayatPembayaran: item.riwayatPembayaran || []
+        }));
+        
+        localStorage.setItem('dataHutang', JSON.stringify(dataFix));
+        updateStorageInfo();
+        return true;
+      } catch (error) {
+        console.error('Gagal menyimpan:', error);
+        return false;
+      }
+        try {
+          // Validasi data sebelum disimpan
+          if (!Array.isArray(data)) {
+            throw new Error("Data harus berupa array");
+          }
+          
+          // Konversi ke string dan simpan
+          const dataString = JSON.stringify(data);
+          localStorage.setItem('dataHutang', dataString);
+          
+          // Debugging: tampilkan ukuran penyimpanan
+          const storageUsed = ((dataString.length * 2) / 1024).toFixed(2); // dalam KB
+          console.log(`Data tersimpan (${storageUsed} KB):`, data);
+          
+          return true;
+        } catch (error) {
+          console.error("Gagal menyimpan data:", error);
+          showNotification("Gagal menyimpan data ke penyimpanan lokal", "error");
+          return false;
+        }
+      }
+    function getDataHutang() {
+        try {
+          const data = localStorage.getItem('dataHutang');
+          if (!data) return [];
+          
+          const parsed = JSON.parse(data);
+          
+          // Validasi struktur data
+          if (!Array.isArray(parsed)) {
+            console.error("Data tidak valid, mengembalikan array kosong");
+            return [];
+          }
+          
+          return parsed.map(item => ({
+              ...item,
+              lunas: item.lunas || false, // Default false jika tidak ada
+              jumlah: item.jumlah || '0',
+              keterangan: item.keterangan || '-'
+            }));
+        } catch (error) {
+          console.error("Error membaca data:", error);
+          showNotification("Gagal memuat data", "error");
+          return [];
+        }
+      }
+
+    // Format Rupiah otomatis
+    document.getElementById('jumlah').addEventListener('input', function(e) {
+      let value = this.value.replace(/[^0-9]/g, '');
+      if (value && !isNaN(value) && parseInt(value) > 0) {
+        this.value = new Intl.NumberFormat('id-ID').format(value);
+      } else {
+        this.value = '';
+      }
+    });
+
+    // Format tanggal Indonesia
+    function formatTanggal(tanggal) {
+          try {
+            const date = new Date(tanggal);
+            if (isNaN(date.getTime())) return tanggal; // Return as-is if invalid date
+            
+            return `${date.getDate().toString().padStart(2, '0')}/${
+              (date.getMonth() + 1).toString().padStart(2, '0')}/${
+              date.getFullYear()}`;
+          } catch (e) {
+            return tanggal; // Return original if error
+          }
+        }
+
+    // Cek apakah nama sudah ada
+    function cekOrangHutang(nama) {
+      const data = getDataHutang();
+      return data.findIndex(item => item.nama.toLowerCase() === nama.toLowerCase());
+    }
+
+    // Notifikasi custom
+    function showNotification(message, type) {
+      const notif = document.createElement('div');
+      notif.className = `notification ${type}`;
+      notif.textContent = message;
+      document.body.appendChild(notif);
+      
+      setTimeout(() => {
+        notif.style.opacity = '1';
+        setTimeout(() => {
+          notif.style.opacity = '0';
+          setTimeout(() => notif.remove(), 300);
+        }, 5000);
+      }, 100);
+    }
+
+    // Simpan/Update data
+    document.getElementById('formHutang').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nama = document.getElementById('nama').value.trim();
+        const jumlah = document.getElementById('jumlah').value.replace(/\./g, '');
+        const tanggal = document.getElementById('tanggal').value;
+        const keterangan = document.getElementById('keterangan').value.trim() || '-';
+      
+        // Validasi input
+        if (!nama || !jumlah || !tanggal) {
+          showNotification('Semua kolom harus diisi!', 'error');
+          return;
+        }
+      
+        if (isNaN(jumlah) || parseInt(jumlah) <= 0) {
+          showNotification('Jumlah hutang harus angka positif!', 'error');
+          return;
+        }
+      
+        const data = getDataHutang();
+        const jumlahBaru = parseInt(jumlah);
+      
+        if (currentEditIndex !== null) {
+          // Mode edit - hanya update data yang ada
+          const item = data[currentEditIndex];
+          
+          // Pastikan tidak mengedit yang sudah lunas
+          if (item.lunas) {
+            showNotification('Tidak bisa mengedit hutang yang sudah lunas!', 'error');
+            return;
+          }
+          
+          item.nama = nama;
+          item.tanggal = tanggal;
+          item.jumlah = jumlahBaru.toString();
+          item.keterangan = keterangan;
+          
+          showNotification(`Data ${nama} berhasil diupdate!`, 'success');
+          currentEditIndex = null;
+          document.getElementById('batalEdit').style.display = 'none';
+        } else {
+          // Mode tambah baru
+          const idx = cekOrangHutang(nama);
+          
+          if (idx !== -1 && !data[idx].lunas) {
+            // Update hutang yang sudah ada (belum lunas)
+            const hutangLama = parseInt(data[idx].jumlah);
+            data[idx] = {
+              ...data[idx],
+              jumlah: (hutangLama + jumlahBaru).toString(),
+              keterangan: data[idx].keterangan + '; ' + keterangan,
+              tanggal: tanggal
+            };
+          } else {
+            // Tambah hutang baru
+            data.push({
+              nama: nama,
+              tanggal: tanggal,
+              jumlah: jumlahBaru.toString(),
+              keterangan: keterangan,
+              lunas: false,
+              riwayatPembayaran: []
+            });
+          }
+          
+          showNotification(`Data ${nama} berhasil disimpan!`, 'success');
+        }
+      
+        // Simpan dan update tampilan
+        if (simpanDataKeLocalStorage(data)) {
+          this.reset();
+          tampilkanData();
+        }
+      });
+        // Form submit pembayaran
+      document.getElementById('formBayar').addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const nama = document.getElementById('namaBayar').value;
+          const jumlah = parseInt(document.getElementById('jumlahBayar').value.replace(/\./g, ''));
+          const tanggal = document.getElementById('tanggalBayar').value;
+        const selectKeterangan = document.getElementById('keteranganBayar');
+        const inputCustom = document.getElementById('keteranganBayarCustom');
+        let keterangan = selectKeterangan.value === 'custom' 
+          ? inputCustom.value.trim()
+          : selectKeterangan.value;
+        
+        if (!keterangan) keterangan = 'Pembayaran hutang';
+          // Validasi input
+          if (!nama || !jumlah || !tanggal) {
+            showNotification('Semua kolom harus diisi!', 'error');
+            return;
+          }
+        
+          const data = getDataHutang();
+          const index = data.findIndex(item => item.nama === nama);
+          
+          if (index === -1) {
+            showNotification('Nama tidak ditemukan!', 'error');
+            return;
+          }
+        
+          // Update data hutang
+          const hutang = data[index];
+          const sisaHutang = hutang.sisaHutang || parseInt(hutang.jumlah);
+          
+          // Buat objek pembayaran baru
+          const pembayaranBaru = { 
+            tanggal, 
+            jumlah,
+            keterangan 
+          };
+        
+          // Update data
+          hutang.riwayatPembayaran = hutang.riwayatPembayaran || [];
+          hutang.riwayatPembayaran.push(pembayaranBaru);
+          hutang.sisaHutang = sisaHutang - jumlah;
+          hutang.lunas = hutang.sisaHutang <= 0;
+        
+          // Simpan menggunakan fungsi yang sudah ada
+          if (simpanDataKeLocalStorage(data)) {
+            showNotification(
+              `Pembayaran ${nama} Rp${jumlah.toLocaleString('id-ID')} (${keterangan}) berhasil!`,
+              'success'
+            );
+        
+            if (hutang.lunas) {
+              showNotification(`🎉 ${nama} sudah LUNAS!`, 'success');
+            }
+        
+            this.reset();
+            tampilkanData();
+            updateDaftarNama();
+            updateRingkasanLunas();
+            
+            
+          }
+        });
+      // Format Rupiah otomatis di input pembayaran
+        document.getElementById('jumlahBayar').addEventListener('input', function(e) {
+          let value = this.value.replace(/[^0-9]/g, '');
+          
+          if (value && !isNaN(value) && parseInt(value) > 0) {
+            this.value = new Intl.NumberFormat('id-ID').format(value);
+          } else {
+            this.value = '';
+          }
+        });
+    document.getElementById('batalEdit').addEventListener('click', function() {
+  // Reset form
+          document.getElementById('formHutang').reset();
+          
+          // Reset variabel edit
+          currentEditIndex = null;
+          
+          showNotification('Edit dibatalkan', 'success');
+        });
+        // Tambahkan di fungsi tampilkanData()
+function updateDaftarNama() {
+  const select = document.getElementById('namaBayar');
+  select.innerHTML = '<option value="">Pilih nama</option>';
+  
+  getDataHutang().forEach(item => {
+    if (!item.lunas) {
+      const option = document.createElement('option');
+      option.value = item.nama;
+      option.textContent = `${item.nama} (Sisa: Rp${item.sisaHutang?.toLocaleString('id-ID') || item.jumlah})`;
+      option.dataset.keterangan = item.keterangan || '';
+      select.appendChild(option);
+    }
+  });
+}
+    // Tampilkan data
+    function tampilkanData(filter = '') {
+      const data = getDataHutang();
+      const tbody = document.querySelector('#tabelHutang tbody');
+      tbody.innerHTML = '';
+    
+      const filteredData = filter 
+        ? data.filter(item => item.nama.toLowerCase().includes(filter.toLowerCase()))
+        : data;
+    
+      filteredData.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.className = item.lunas ? 'lunas' : 'belum-lunas';
+        
+        // Hanya tampilkan tombol edit jika belum lunas
+        const editButton = item.lunas 
+          ? '' 
+          : `<button class="edit-btn" onclick="editData(${index})">✏ Edit</button>`;
+        
+        tr.innerHTML = `
+          <td>${item.nama}</td>
+          <td>${formatTanggal(item.tanggal)}</td>
+          <td>Rp${parseInt(item.jumlah).toLocaleString('id-ID')}</td>
+          <td>${item.keterangan || '-'}</td>
+          <td>${item.lunas ? 'Lunas' : 'Belum Lunas'}</td>
+          <td>
+            <button class="${item.lunas ? 'batal-btn' : 'lunasi-btn'}" onclick="ubahStatus(${index})">
+              ${item.lunas ? '❌ Batalkan' : '✔ Lunasi'}
+            </button>
+            ${editButton}
+            <button class="hapus-btn" onclick="hapusData(${index})">🗑 Hapus</button>
+            <button class="riwayat-btn" onclick="showRiwayat('${item.nama}')">📜 Riwayat</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      
+      updateRingkasan();
+      updateDaftarNama();
+    }
+
+    // Update ringkasan
+    function updateRingkasanLunas() {
+  const data = getDataHutang();
+  
+  // Hitung hanya yang belum lunas
+  const hutangAktif = data.filter(item => !item.lunas);
+  const totalOrang = hutangAktif.length;
+
+  let totalHutang = 0;
+  let totalLunas = 0;
+  let totalBelumLunas = 0;
+
+  data.forEach(item => {
+    const jumlah = parseInt(item.jumlah) || 0;
+    totalHutang += jumlah;
+    
+    if (item.lunas) {
+      totalLunas += jumlah;
+    } else {
+      totalBelumLunas += jumlah;
+    }
+  });
+
+  // Update tampilan
+  document.getElementById('totalOrang').textContent = `Total Orang yang Hutang: ${totalOrang}`;
+  document.getElementById('totalHutang').textContent = `Total Hutang Aktif: Rp${totalBelumLunas.toLocaleString('id-ID')}`;
+  document.getElementById('totalLunas').textContent = `Hutang Lunas: Rp${totalLunas.toLocaleString('id-ID')}`;
+  document.getElementById('totalBelumLunas').textContent = `Hutang Belum Lunas: Rp${totalBelumLunas.toLocaleString('id-ID')}`;
+}
+// Jalankan sekali saat pertama load
+function migrateOldData() {
+  const oldData = localStorage.getItem('dataHutang');
+  if (!oldData) return;
+
+  try {
+    const parsed = JSON.parse(oldData);
+    if (parsed.some(item => item.lunas === undefined)) {
+      const migrated = parsed.map(item => ({
+        ...item,
+        lunas: item.lunas || false
+      }));
+      localStorage.setItem('dataHutang', JSON.stringify(migrated));
+    }
+  } catch (e) {
+    console.log('Tidak perlu migrasi data');
+  }
+}
+
+// Panggil saat load halaman
+migrateOldData();
+    // Ubah status lunas/belum
+    function ubahStatus(index) {
+      const data = getDataHutang();
+      data[index].lunas = !data[index].lunas;
+      simpanDataKeLocalStorage(data);
+      showNotification(`Status hutang ${data[index].nama} diubah!`, 'success');
+      tampilkanData();
+      updateRingkasanLunas();
+    }
+
+    // Edit data
+    function editData(index) {
+        const data = getDataHutang();
+        const item = data[index];
+        
+        // Validasi tambahan - tidak bisa edit yang sudah lunas
+        if (item.lunas) {
+          showNotification('Tidak bisa mengedit hutang yang sudah lunas!', 'error');
+          return;
+        }
+        
+        document.getElementById('nama').value = item.nama;
+        document.getElementById('tanggal').value = item.tanggal;
+        document.getElementById('jumlah').value = parseInt(item.jumlah).toLocaleString('id-ID');
+        document.getElementById('keterangan').value = item.keterangan;
+        document.getElementById('batalEdit').style.display = 'inline-block';
+        
+        currentEditIndex = index;
+        showNotification(`Sedang edit data ${item.nama}. Klik "Simpan" untuk update!`, 'success');
+      }
+    document.getElementById('batalEdit').style.display = 'none';
+
+    // Hapus data
+    function hapusData(index) {
+      if (confirm('Yakin hapus data ini?')) {
+        const data = getDataHutang();
+        const nama = data[index].nama;
+        data.splice(index, 1);
+        simpanDataKeLocalStorage(data);
+        updateStorageInfo();
+        showNotification(`Data ${nama} dihapus!`, 'success');
+        tampilkanData();
+      }
+    }
+
+    // Pencarian
+    document.getElementById('cari').addEventListener('input', function() {
+      tampilkanData(this.value);
+    });
+
+    // Jalankan saat halaman dimuat
+    tampilkanData();
+    // Hitung penggunaan localStorage
+      
+      
+      // Update ringkasan
+      function updateRingkasan() {
+        const data = getDataHutang();
+        let totalHutang = 0;
+        let totalLunas = 0;
+        let totalBelumLunas = 0;
+        let totalOrang = data.length;
+      
+        data.forEach(item => {
+          const jumlah = parseInt(item.jumlah);
+          totalHutang += jumlah;
+          if (item.lunas) {
+            totalLunas += jumlah;
+          } else {
+            totalBelumLunas += jumlah;
+          }
+        });
+      
+        document.getElementById('totalHutang').textContent = `Total Hutang: Rp${totalHutang.toLocaleString('id-ID')}`;
+        document.getElementById('totalLunas').textContent = `Hutang Lunas: Rp${totalLunas.toLocaleString('id-ID')}`;
+        document.getElementById('totalBelumLunas').textContent = `Hutang Belum Lunas: Rp${totalBelumLunas.toLocaleString('id-ID')}`;
+        document.getElementById('totalOrang').textContent = `Total Orang: ${totalOrang}`;
+      }
+      // Log storage usage ke console dengan progress bar
+      let total = 0;
+      for (let x in localStorage) {
+        if (localStorage.hasOwnProperty(x)) {
+          total += ((localStorage[x].length + x.length) * 2);
+        }
+      }
+      const kbUsed = (total / 1024).toFixed(2);
+      const percent = Math.round((kbUsed / 5120) * 100); // Bulatkan ke integer
+      const filled = Math.round(percent / 10); // 1 ■ = 10%
+      const empty = 10 - filled; // Total bar 10 karakter
+      console.log(`[${'■'.repeat(filled)}${'□'.repeat(empty)}] ${percent}% terpakai`);
+      document.getElementById('toggleTabel').addEventListener('click', function() {
+        const tabel = document.getElementById('tabelHutang');
+        const container = document.querySelector('.container');
+        
+        tabel.classList.toggle('hidden');
+  // Update teks tombol
+  this.textContent = tabel.classList.contains('hidden') 
+    ? '👁️ Tampilkan Tabel' 
+    : '👁️ Sembunyikan Tabel';
+});
+
+// Popup riwayat
+    function showRiwayat(nama) {
+      const data = getDataHutang().find(item => item.nama === nama);
+      if (!data) return;
+    
+      const riwayat = data.riwayatPembayaran || [];
+      const totalBayar = riwayat.reduce((sum, item) => sum + item.jumlah, 0);
+      const totalHutang = parseInt(data.jumlah);
+      const sisaHutang = totalHutang - totalBayar;
+    
+      let riwayatContainer = document.getElementById('riwayatContainer');
+      if (!riwayatContainer) {
+        riwayatContainer = document.createElement('div');
+        riwayatContainer.id = 'riwayatContainer';
+        riwayatContainer.className = 'riwayat-container';
+        document.querySelector('.container').appendChild(riwayatContainer);
+      }
+    
+      riwayatContainer.innerHTML = `
+        <button class="close-riwayat" onclick="this.parentElement.style.display='none'">
+          ✕ Tutup
+        </button>
+        <h4>📜 Riwayat Pembayaran ${nama}</h4>
+        <ul class="riwayat-list">
+          ${riwayat.map(item => `
+            <li>
+              <div>
+                <strong>${formatTanggal(item.tanggal)}</strong>
+                <div class="riwayat-keterangan">${item.keterangan || 'Pembayaran'}</div>
+              </div>
+              <span>Rp${item.jumlah.toLocaleString('id-ID')}</span>
+            </li>
+          `).join('')}
+        </ul>
+        <div class="riwayat-total">
+          <div>Total Hutang: Rp${totalHutang.toLocaleString('id-ID')}</div>
+          <div>Total Dibayar: Rp${totalBayar.toLocaleString('id-ID')}</div>
+          <div>Sisa Hutang: Rp${Math.max(sisaHutang, 0).toLocaleString('id-ID')}</div>
+        </div>
+      `;
+      riwayatContainer.style.display = 'block';
+    }
+function perbaikiDataKeterangan() {
+  const data = getDataHutang();
+  const dataDiperbaiki = data.map(item => ({
+    ...item,
+    keterangan: typeof item.keterangan === 'object' ? 'Keterangan tidak valid' : item.keterangan
+  }));
+  
+  localStorage.setItem('dataHutang', JSON.stringify(dataDiperbaiki));
+  return dataDiperbaiki;
+}
+
+// Jalankan sekali saat load halaman
+perbaikiDataKeterangan();
+// Handle jika user refresh/tutup browser saat mode edit
+function updateKeteranganOptions(nama) {
+  const select = document.getElementById('keteranganBayar');
+  const inputCustom = document.getElementById('keteranganBayarCustom');
+  
+  // Reset options
+  select.innerHTML = '<option value="">Pilih keterangan terkait</option>';
+  inputCustom.style.display = 'none';
+  inputCustom.value = '';
+
+  if (!nama) return;
+
+  // Cari data hutang
+  const data = getDataHutang();
+  const hutang = data.find(item => item.nama === nama);
+  if (!hutang) return;
+
+  // Ambil keterangan dari data hutang
+  const keteranganHutang = hutang.keterangan || '';
+  const keteranganList = keteranganHutang.split(';').map(k => k.trim()).filter(k => k);
+
+  // Tambahkan options
+  keteranganList.forEach(k => {
+    const option = document.createElement('option');
+    option.value = k;
+    option.textContent = k;
+    select.appendChild(option);
+  });
+
+  // Tambahkan option custom
+  const customOption = document.createElement('option');
+  customOption.value = 'custom';
+  customOption.textContent = 'Keterangan lain...';
+  select.appendChild(customOption);
+}
+// Saat nama dipilih di form bayar
+document.getElementById('namaBayar').addEventListener('change', function() {
+  updateKeteranganOptions(this.value);
+});
+
+// Saat dropdown keterangan berubah
+document.getElementById('keteranganBayar').addEventListener('change', function() {
+  const inputCustom = document.getElementById('keteranganBayarCustom');
+  inputCustom.style.display = this.value === 'custom' ? 'block' : 'none';
+});
+//Biar aman di reload
+window.addEventListener('beforeunload', function(e) {
+  if (currentEditIndex !== null) {
+    e.preventDefault();
+    e.returnValue = 'Anda sedang dalam mode edit. Yakin ingin meninggalkan halaman?';
+    return e.returnValue;
+  }
+});
+// Tambahkan di awal fungsi tampilkanData()
+console.log('Data dari localStorage:', getDataHutang());
+console.log('Data sebelum disimpan:', {
+  nama, jumlah, tanggal, keterangan, 
+  dataSebelumnya: getDataHutang()
+});
+  </script>
+<script>
+  function updateStorageInfo() {
+  // Hitung ukuran storage (hanya data tabungan + hutang)
+  const tabunganSize = (localStorage.getItem('dataTabunganWarung')?.length || 0) * 2 / 1024;
+  const hutangSize = (localStorage.getItem('dataHutang')?.length || 0) * 2 / 1024;
+  const totalUsed = tabunganSize + hutangSize;
+
+  // Update UI progress bar gabungan
+  document.getElementById('totalStorageUsed').textContent = `${totalUsed.toFixed(2)} KB`;
+  document.getElementById('storageTabungan').textContent = `${tabunganSize.toFixed(2)} KB`;
+  document.getElementById('storageHutang').textContent = `${hutangSize.toFixed(2)} KB`;
+  document.getElementById('totalProgressFill').style.width = `${(totalUsed / 5120) * 100}%`;
+
+  // Update juga progress bar di form hutang (jika masih ingin ditampilkan)
+  document.getElementById('storageUsed').textContent = `${totalUsed.toFixed(2)} KB`;
+  document.getElementById('progressFill').style.width = `${(totalUsed / 5120) * 100}%`;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+       // ... kode inisialisasi
+      migrateOldData();
+      perbaikiDataKeterangan();
+      tampilkanData();
+      updateDaftarNama();
+      updateRingkasanLunas();
+    
+      // Tambahkan inisialisasi tabungan
+      updateDaftarPenabung();
+      tampilkanDataTabungan();
+      updateStorageInfo(); // <-- Update storage info gabungan
+    
+      document.getElementById('batalEdit').style.display = 'none';
+     } catch (error) {
+       console.error("Gagal inisialisasi:", error);
+     }
+
+});
+</script>
+</body>
+</html>
